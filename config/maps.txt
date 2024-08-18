@@ -68,3 +68,6 @@ endmap
 map ouroboros
 	votable
 endmap
+
+map oshanz
+endmap

@@ -1,0 +1,34 @@
+{
+	"version": 2,
+	"map_name": "Oshanz",
+	"map_path": "map_files/Oshanz",
+	"map_file": "Oshanz.dmm",
+	"space_ruin_levels": 0,
+	"space_empty_levels": 0,
+	"planetary": 1,
+	"shuttles": {
+	},
+	"traits": [
+		{
+			"Up": true,
+			"OshanTrait": true,
+			"Daycycle": true,
+			"Linkage": null,
+			"Gravity": true,
+			"Baseturf": "/turf/open/floor/plating/ocean",
+			"No Parallax": true
+		},
+		{
+			"Down": true,
+			"Up": true,
+			"OshanTrait": true,
+			"Mining": true,
+			"Linkage": null,
+			"Gravity": true,
+			"Baseturf": "/turf/open/openspace/icemoon/keep_below",
+			"No Parallax": true
+		}
+
+	],
+	"minetype": "none"
+}
