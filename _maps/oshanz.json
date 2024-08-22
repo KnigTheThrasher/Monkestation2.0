@@ -7,6 +7,7 @@
 	"space_empty_levels": 0,
 	"planetary": 1,
 	"shuttles": {
+		"emergency": "emergency_box"
 	},
 	"traits": [
 		{
@@ -20,12 +21,11 @@
 		},
 		{
 			"Down": true,
-			"Up": true,
 			"OshanTrait": true,
 			"Mining": true,
 			"Linkage": null,
 			"Gravity": true,
-			"Baseturf": "/turf/open/openspace/icemoon/keep_below",
+			"Baseturf": "/turf/open/floor/plating/ocean",
 			"No Parallax": true
 		}
 

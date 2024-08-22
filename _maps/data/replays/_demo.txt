@@ -1,0 +1,26 @@
+chat world "<span class='boldannounce'>Initialized Demo subsystem within 0.01 seconds!</span>"
+chat world "<span class='boldannounce'>Initialized Twitch Events subsystem within 0 seconds!</span>"
+chat world "<span class='boldannounce'>Initialized Ban Cache subsystem within 0 seconds!</span>"
+chat world "<span class='boldannounce'>Initialized Init Profiler subsystem within 0 seconds!</span>"
+chat world "<span class='boldannounce'>Initializations complete within 59.9 seconds!</span>"
+time 200.5
+chat world "<span class='notice'><b>Welcome to Space Station 13!</b></span>"
+chat world "<span class='infoplain'><font color='purple'>\n<span class='bold'>Storyteller vote started by pick round storyteller.</span>\nType <b>vote</b> or click <a href='byond://winset?command=vote'>here</a> to place your votes.\nYou have 1 minute to vote.</font></span>"
+time 205.5
+chat knighthethrasher "<span class='notice'>Lobby music: <b>Look Forward</b> by <b>Skyline</b>.</span>"
+time 347.5
+chat knighthethrasher "<span class='warning'>Failed to load config: oshanz.json. Check that the fields are filled out correctly. \"map_path\": \"custom\" and \"map_file\": \"your_map_name.dmm\"</span>"
+chat world "<span class='boldannounce'>Initialized Demo subsystem within 0.01 seconds!</span>"
+chat world "<span class='boldannounce'>Initialized Twitch Events subsystem within 0 seconds!</span>"
+chat world "<span class='boldannounce'>Initialized Ban Cache subsystem within 0 seconds!</span>"
+chat world "<span class='boldannounce'>Initialized Init Profiler subsystem within 0 seconds!</span>"
+chat world "<span class='boldannounce'>Initializations complete within 66.4 seconds!</span>"
+time 222
+chat world "<span class='notice'><b>Welcome to Space Station 13!</b></span>"
+chat world "<span class='infoplain'><font color='purple'>\n<span class='bold'>Storyteller vote started by pick round storyteller.</span>\nType <b>vote</b> or click <a href='byond://winset?command=vote'>here</a> to place your votes.\nYou have 1 minute to vote.</font></span>"
+time 227
+chat knighthethrasher "<span class='notice'>Lobby music: <b>Look Forward</b> by <b>Skyline</b>.</span>"
+time 356.5
+chat world "<span class='boldannounce'>Rebooting World in 1 second. Initiated by KnighTheThrasher.</span>"
+time 366.5
+chat world "<span class='boldannounce'>Rebooting world...</span>"
