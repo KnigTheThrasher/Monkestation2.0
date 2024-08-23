@@ -1,0 +1,50 @@
+{
+	"version": 1,
+	"map_name": "kushan",
+	"map_path": "map_files/kushan",
+	"map_file": "kushan.dmm",
+	"minetype": "none",
+	"space_ruin_levels": 0,
+	"space_empty_levels": 0,
+	"planetary": 1,
+	"shuttles": {
+	},
+	"traits": [
+
+			{
+				"Up": true,
+				"Mining": true,
+				"Linkage": null,
+				"Gravity": true,
+				"Daycycle": true,
+				"Ice Ruins Underground": true,
+				"Baseturf": "/turf/open/floor/plating/ocean",
+				"No Parallax": true,
+				"Forced Safety": true,
+				"OshanTrait": true
+			},
+			{
+				"Down": true,
+				"Up": true,
+				"Mining": true,
+				"Linkage": null,
+				"Gravity": true,
+				"Daycycle": true,
+				"Ice Ruins Underground": true,
+				"Baseturf": "/turf/open/openspace/icemoon/keep_below",
+				"No Parallax": true,
+				"OshanTrait": true
+			},
+			{
+				"Down": true,
+				"Mining": true,
+				"Linkage": null,
+				"Gravity": true,
+				"Ice Ruins": true,
+				"Daycycle": true,
+				"Baseturf": "/turf/open/openspace/icemoon/keep_below",
+				"No Parallax": true,
+				"OshanTrait": true
+			}
+	]
+}
