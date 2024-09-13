@@ -5276,9 +5276,10 @@
 	id_tag = "medbay_foyer";
 	name = "Medbay"
 	},
-/obj/effect/mapping_helpers/airlock/access/all/medical/general,
 /obj/effect/mapping_helpers/airlock/unres,
 /obj/effect/landmark/navigate_destination/med,
+/obj/effect/mapping_helpers/airlock/access/any/security/brig_physician,
+/obj/effect/mapping_helpers/airlock/access/any/medical/general,
 /turf/open/floor/iron/white/textured,
 /area/station/medical/medbay/central)
 "bKL" = (
@@ -11956,7 +11957,8 @@
 	dir = 8
 	},
 /obj/machinery/door/airlock/maintenance,
-/obj/effect/mapping_helpers/airlock/access/all/medical/general,
+/obj/effect/mapping_helpers/airlock/access/any/security/brig_physician,
+/obj/effect/mapping_helpers/airlock/access/any/medical/general,
 /turf/open/floor/plating,
 /area/station/maintenance/department/medical)
 "dVT" = (
@@ -28080,6 +28082,10 @@
 /obj/machinery/atmospherics/pipe/smart/manifold4w/scrubbers/hidden/layer2,
 /obj/machinery/atmospherics/pipe/smart/manifold4w/supply/hidden/layer4,
 /obj/structure/cable,
+/obj/machinery/light_switch/directional/east{
+	pixel_y = 7;
+	pixel_x = 24
+	},
 /turf/open/floor/wood,
 /area/station/command/heads_quarters/hop)
 "jmo" = (
@@ -31764,7 +31770,8 @@
 /obj/machinery/door/airlock/maintenance{
 	name = "Medbay Maintenance"
 	},
-/obj/effect/mapping_helpers/airlock/access/all/medical/general,
+/obj/effect/mapping_helpers/airlock/access/any/security/brig_physician,
+/obj/effect/mapping_helpers/airlock/access/any/medical/general,
 /turf/open/floor/plating,
 /area/station/maintenance/starboard/aft)
 "kzv" = (
@@ -35159,8 +35166,9 @@
 /obj/machinery/door/airlock/medical/glass{
 	name = "Medical Side Entrance"
 	},
-/obj/effect/mapping_helpers/airlock/access/all/medical/general,
 /obj/effect/mapping_helpers/airlock/unres,
+/obj/effect/mapping_helpers/airlock/access/any/security/brig_physician,
+/obj/effect/mapping_helpers/airlock/access/any/medical/general,
 /turf/open/floor/iron/dark/textured,
 /area/station/medical/medbay/central)
 "lFJ" = (
@@ -38377,11 +38385,11 @@
 	name = "Queue Shutters Control";
 	req_access = list("hop")
 	},
-/obj/machinery/light_switch/directional/north{
-	pixel_x = -4;
-	pixel_y = 34
-	},
 /obj/machinery/pdapainter,
+/obj/machinery/button/ticket_machine{
+	pixel_y = 34;
+	pixel_x = -6
+	},
 /turf/open/floor/wood,
 /area/station/command/heads_quarters/hop)
 "mMI" = (
@@ -46913,7 +46921,6 @@
 /turf/open/floor/iron/dark,
 /area/station/hallway/primary/port)
 "pzz" = (
-/obj/structure/table/reinforced,
 /obj/structure/reagent_dispensers/wall/peppertank/directional/east,
 /turf/open/floor/iron/dark,
 /area/station/command/heads_quarters/blueshield)
@@ -48994,8 +49001,9 @@
 /obj/machinery/door/airlock/maintenance{
 	name = "Medbay Maintenance"
 	},
-/obj/effect/mapping_helpers/airlock/access/all/medical/general,
 /obj/machinery/duct,
+/obj/effect/mapping_helpers/airlock/access/any/security/brig_physician,
+/obj/effect/mapping_helpers/airlock/access/any/medical/general,
 /turf/open/floor/iron/white/textured,
 /area/station/maintenance/starboard/aft)
 "qoa" = (
@@ -50841,13 +50849,14 @@
 /obj/machinery/door/airlock/medical/glass{
 	name = "Medical Side Entrance"
 	},
-/obj/effect/mapping_helpers/airlock/access/all/medical/general,
 /obj/structure/disposalpipe/segment{
 	dir = 4
 	},
 /obj/effect/mapping_helpers/airlock/unres{
 	dir = 4
 	},
+/obj/effect/mapping_helpers/airlock/access/any/security/brig_physician,
+/obj/effect/mapping_helpers/airlock/access/any/medical/general,
 /turf/open/floor/iron/dark/textured,
 /area/station/medical/medbay/central)
 "qVb" = (
@@ -65142,8 +65151,9 @@
 	id_tag = "medbay_foyer";
 	name = "Medbay"
 	},
-/obj/effect/mapping_helpers/airlock/access/all/medical/general,
 /obj/effect/mapping_helpers/airlock/unres,
+/obj/effect/mapping_helpers/airlock/access/any/security/brig_physician,
+/obj/effect/mapping_helpers/airlock/access/any/medical/general,
 /turf/open/floor/iron/white/textured,
 /area/station/medical/medbay/central)
 "vHv" = (
@@ -71103,11 +71113,8 @@
 /area/station/maintenance/department/cargo)
 "xIY" = (
 /obj/structure/window/reinforced/tinted/spawner/directional/south,
-/obj/structure/closet/secure_closet/tac{
-	req_access = list("captain")
-	},
-/obj/effect/turf_decal/box/blue,
 /obj/machinery/door/firedoor/border_only,
+/obj/structure/table/reinforced,
 /turf/open/floor/iron/dark,
 /area/station/command/heads_quarters/blueshield)
 "xJb" = (
@@ -87939,8 +87946,8 @@ dyk
 kDb
 emg
 juc
-juc
-juc
+kgn
+kgn
 nJa
 xqS
 rCa
@@ -88710,8 +88717,8 @@ pEY
 vaR
 uFv
 juc
-kgn
-kgn
+juc
+juc
 nJa
 vom
 pEY
