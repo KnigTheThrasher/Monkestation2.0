@@ -3829,13 +3829,14 @@
 "bIM" = (
 /obj/machinery/power/apc/auto_name/directional/west,
 /obj/structure/cable,
-/mob/living/basic/pet/dog/pug/mcgriff,
-/obj/structure/bed/dogbed{
-	name = "pet bed";
-	desc = "A comfy-looking pet bed. You can even strap your pet in, in case the gravity turns off."
-	},
 /obj/effect/turf_decal/trimline/red/filled/line{
 	dir = 10
+	},
+/obj/structure/bed{
+	dir = 1
+	},
+/obj/item/bedsheet/red{
+	dir = 1
 	},
 /turf/open/floor/iron/dark/textured_large,
 /area/station/security/warden)
@@ -4220,9 +4221,7 @@
 /obj/structure/cable,
 /obj/machinery/light_switch/directional/east,
 /obj/machinery/light/directional/east,
-/obj/machinery/computer/department_orders/security{
-	dir = 1
-	},
+/obj/structure/dresser,
 /turf/open/floor/wood/large,
 /area/station/security/warden)
 "bTb" = (
@@ -5160,22 +5159,6 @@
 /turf/open/floor/circuit,
 /area/station/tcommsat/server)
 "cqG" = (
-/obj/machinery/button/door{
-	desc = "Controls the shutters over the brig windows.";
-	id = "prisonshutters";
-	name = "Prison Lockdown Button";
-	pixel_x = 9;
-	pixel_y = 27;
-	req_access = list("security");
-	layer = 3.1
-	},
-/obj/machinery/button/door{
-	desc = "Controls the shutters over the brig windows.";
-	id = "securityshutter";
-	name = "Security Lockdown Button";
-	pixel_y = 34;
-	req_access = list("security")
-	},
 /obj/structure/chair/comfy/teal{
 	dir = 4
 	},
@@ -8036,6 +8019,7 @@
 /area/station/medical/psychology)
 "dHG" = (
 /obj/effect/turf_decal/trimline/red/corner,
+/mob/living/simple_animal/bot/secbot/beepsky,
 /turf/open/floor/iron/dark/textured,
 /area/station/security/office)
 "dHM" = (
@@ -19070,7 +19054,6 @@
 	pixel_x = -26
 	},
 /obj/machinery/light/floor/has_bulb,
-/mob/living/simple_animal/bot/secbot/beepsky,
 /turf/open/floor/iron/dark/textured,
 /area/station/security/office)
 "iGC" = (
@@ -31004,7 +30987,6 @@
 "nGi" = (
 /obj/structure/reagent_dispensers/wall/peppertank/directional/north,
 /obj/structure/closet/secure_closet/warden,
-/obj/item/book/manual/wiki/security_space_law,
 /obj/item/ammo_box/magazine/m35{
 	pixel_y = 10;
 	pixel_x = -8;
@@ -31020,6 +31002,7 @@
 /obj/effect/turf_decal/trimline/red/filled/line{
 	dir = 9
 	},
+/obj/item/gun/energy/laser,
 /turf/open/floor/iron/dark/textured_large,
 /area/station/security/warden)
 "nGw" = (
@@ -38645,32 +38628,49 @@
 	pixel_y = 9;
 	req_access = list("security")
 	},
-/obj/structure/table,
-/obj/machinery/button/door{
+/obj/machinery/button/flasher{
+	id = "secentranceflasher";
+	name = "Brig Entrance Flasher";
+	pixel_y = 42;
+	req_access = list("security");
+	pixel_x = -10
+	},
+/obj/machinery/button/door/directional/north{
 	desc = "A door remote control switch for the interior brig doors.";
 	id = "innerbrig";
 	name = "Brig Interior Door Control";
 	normaldoorcontrol = 1;
-	pixel_x = -9;
-	pixel_y = 10;
-	req_access = list("security")
+	req_access = list("security");
+	pixel_x = -9
 	},
-/obj/machinery/button/door{
+/obj/machinery/button/door/directional/north{
 	desc = "A door remote control switch for the exterior brig doors.";
 	id = "outerbrig";
 	name = "Brig Exterior Door Control";
 	normaldoorcontrol = 1;
-	pixel_x = 9;
-	pixel_y = 10;
-	req_access = list("security")
-	},
-/obj/machinery/button/flasher{
-	id = "secentranceflasher";
-	name = "Brig Entrance Flasher";
-	pixel_y = -5;
 	req_access = list("security");
-	pixel_x = -10
+	pixel_x = 9
 	},
+/obj/machinery/button/door/directional/north{
+	desc = "Controls the shutters over the brig windows.";
+	id = "securityshutter";
+	name = "Security Lockdown Button";
+	req_access = list("security");
+	pixel_y = 33
+	},
+/obj/machinery/button/door/directional/north{
+	desc = "Controls the shutters over the brig windows.";
+	id = "prisonshutters";
+	name = "Prison Lockdown Button";
+	req_access = list("security");
+	pixel_y = 42;
+	pixel_x = 9
+	},
+/obj/structure/bed/dogbed{
+	name = "pet bed";
+	desc = "A comfy-looking pet bed. You can even strap your pet in, in case the gravity turns off."
+	},
+/mob/living/basic/pet/dog/pug/mcgriff,
 /turf/open/floor/wood/large,
 /area/station/security/warden)
 "req" = (
@@ -53399,6 +53399,8 @@
 /obj/effect/turf_decal/trimline/red/filled/line{
 	dir = 8
 	},
+/obj/item/book/manual/wiki/security_space_law,
+/obj/structure/table,
 /turf/open/floor/iron/dark/textured_large,
 /area/station/security/warden)
 "xIh" = (
