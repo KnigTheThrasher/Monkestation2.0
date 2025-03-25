@@ -2,6 +2,10 @@ GLOBAL_LIST_EMPTY(preferences_datums)
 
 /datum/preferences
 	var/client/parent
+	/// The key of the parent client.
+	var/parent_key
+	/// The ckey of the parent client.
+	var/parent_ckey
 	/// The path to the general savefile for this datum
 	var/path
 	/// Whether or not we allow saving/loading. Used for guests, if they're enabled
@@ -87,6 +91,8 @@ GLOBAL_LIST_EMPTY(preferences_datums)
 
 	/// If set to TRUE, will update character_profiles on the next ui_data tick.
 	var/tainted_character_profiles = FALSE
+	///have we finished loading
+	var/loaded = FALSE
 
 /datum/preferences/Destroy(force)
 	QDEL_NULL(character_preview_view)
@@ -96,13 +102,15 @@ GLOBAL_LIST_EMPTY(preferences_datums)
 
 /datum/preferences/New(client/parent)
 	src.parent = parent
+	src.parent_key = parent?.key
+	src.parent_ckey = parent?.ckey
 
 	for (var/middleware_type in subtypesof(/datum/preference_middleware))
 		middleware += new middleware_type(src)
 
 	if(IS_CLIENT_OR_MOCK(parent))
-		load_and_save = !is_guest_key(parent.key)
-		load_path(parent.ckey)
+		load_and_save = !is_guest_key(parent_key)
+		load_path(parent_ckey)
 		if(load_and_save && !fexists(path))
 			try_savefile_type_migration()
 		unlock_content = !!parent.IsByondMember()
@@ -121,6 +129,7 @@ GLOBAL_LIST_EMPTY(preferences_datums)
 	var/loaded_preferences_successfully = load_preferences()
 	if(loaded_preferences_successfully)
 		if(load_character())
+			loaded = TRUE
 			return
 	//we couldn't load character data so just randomize the character appearance + name
 	randomise_appearance_prefs() //let's create a random character then - rather than a fat, bald and naked man.
@@ -129,8 +138,14 @@ GLOBAL_LIST_EMPTY(preferences_datums)
 		parent.set_macros()
 
 	if(!loaded_preferences_successfully)
+		if(load_preferences())
+			if(load_character())
+				loaded = TRUE
+				return
+		message_admins("[parent]'s prefs failed to load twice! Their keybindings and tokens may have been lost please check on this.")
 		save_preferences()
 	save_character() //let's save this new random character so it doesn't keep generating new ones.
+	loaded = TRUE
 
 /datum/preferences/ui_interact(mob/user, datum/tgui/ui)
 	// There used to be code here that readded the preview view if you "rejoined"
@@ -144,13 +159,6 @@ GLOBAL_LIST_EMPTY(preferences_datums)
 		ui = new(user, src, "PreferencesMenu")
 		ui.set_autoupdate(FALSE)
 		ui.open()
-
-		// HACK: Without this the character starts out really tiny because of some BYOND bug.
-		// You can fix it by changing a preference, so let's just forcably update the body to emulate this.
-		// Lemon from the future: this issue appears to replicate if the byond map (what we're relaying here)
-		// Is shown while the client's mouse is on the screen. As soon as their mouse enters the main map, it's properly scaled
-		// I hate this place
-		addtimer(CALLBACK(character_preview_view, TYPE_PROC_REF(/atom/movable/screen/map_view/char_preview, update_body)), 1 SECONDS)
 
 /datum/preferences/ui_state(mob/user)
 	return GLOB.always_state
@@ -209,13 +217,10 @@ GLOBAL_LIST_EMPTY(preferences_datums)
 		return
 
 	switch (action)
+		// monkestation start: please get rid of this asap
 		if ("update_body")
-			// monkestation start: janky bugfixing for runtimes
-			if(!QDELETED(character_preview_view))
-				character_preview_view.update_body()
-			else
-				addtimer(CALLBACK(src, PROC_REF(create_character_preview_view), usr), 0.5 SECONDS, TIMER_DELETE_ME)
-			// monkestation end
+			character_preview_view?.update_body()
+		// monkestation end
 		if ("change_slot")
 			// Save existing character
 			save_character()
@@ -229,12 +234,7 @@ GLOBAL_LIST_EMPTY(preferences_datums)
 			for (var/datum/preference_middleware/preference_middleware as anything in middleware)
 				preference_middleware.on_new_character(usr)
 
-			// monkestation start: janky bugfixing for runtimes
-			if(!QDELETED(character_preview_view))
-				character_preview_view.update_body()
-			else
-				addtimer(CALLBACK(src, PROC_REF(create_character_preview_view), usr), 0.5 SECONDS, TIMER_DELETE_ME)
-			// monkestation end
+			character_preview_view?.update_body()
 
 			return TRUE
 		if ("rotate")
@@ -290,7 +290,7 @@ GLOBAL_LIST_EMPTY(preferences_datums)
 				default_value || COLOR_WHITE,
 			)
 
-			if (!new_color)
+			if (!new_color && !requested_preference.allows_nulls)
 				return FALSE
 
 			if (!update_preference(requested_preference, new_color))
@@ -363,6 +363,8 @@ GLOBAL_LIST_EMPTY(preferences_datums)
 			continue
 
 		value_cache -= preference.type
+		if(QDELETED(parent))
+			return
 		preference.apply_to_client(parent, read_preference(preference.type))
 
 /// A preview of a character for use in the preferences menu
@@ -477,11 +479,15 @@ GLOBAL_LIST_EMPTY(preferences_datums)
 /// Applies the given preferences to a human mob.
 /datum/preferences/proc/apply_prefs_to(mob/living/carbon/human/character, icon_updates = TRUE)
 	character.dna.features = list()
+	character.dna.apply_color_palettes(src)
 
+	var/species_type = read_preference(/datum/preference/choiced/species)
+	var/datum/species/species = new species_type
 	for (var/datum/preference/preference as anything in get_preferences_in_priority_order())
 		if (preference.savefile_identifier != PREFERENCE_CHARACTER)
 			continue
-
+		if(preference.relevant_inherent_trait && !(preference.relevant_inherent_trait in species.inherent_traits))
+			continue
 		preference.apply_to_human(character, read_preference(preference.type))
 
 	character.dna.real_name = character.real_name

@@ -1,7 +1,9 @@
 /mob/living/carbon/human/can_equip(obj/item/equip_target, slot, disable_warning = FALSE, bypass_equip_delay_self = FALSE, ignore_equipped = FALSE)
 	if(SEND_SIGNAL(src, COMSIG_HUMAN_EQUIPPING_ITEM, equip_target, slot) == COMPONENT_BLOCK_EQUIP)
 		return FALSE
-
+	if((slot & ITEM_SLOT_FEET) && HAS_TRAIT(src, TRAIT_NON_IMPORTANT_SHOE_BLOCK))
+		if(!istype(equip_target, /obj/item/clothing/shoes/mod))
+			return FALSE
 	return dna.species.can_equip(equip_target, slot, disable_warning, src, bypass_equip_delay_self, ignore_equipped)
 
 /mob/living/carbon/human/get_item_by_slot(slot_id)
@@ -142,9 +144,19 @@
 
 //This is an UNSAFE proc. Use mob_can_equip() before calling this one! Or rather use equip_to_slot_if_possible() or advanced_equip_to_slot_if_possible()
 // Initial is used to indicate whether or not this is the initial equipment (job datums etc) or just a player doing it
-/mob/living/carbon/human/equip_to_slot(obj/item/I, slot, initial = FALSE, redraw_mob = FALSE)
+/mob/living/carbon/human/equip_to_slot(obj/item/I, slot, initial = FALSE, redraw_mob = FALSE, move_equipped = FALSE) //MONKESTATION EDIT - Added 'move_equipped = FALSE'
 	if(!..()) //a check failed or the item has already found its slot
 		return
+
+	//MONKESTATION EDIT - Don't fucking nuke our items, please.
+	if(move_equipped)
+		var/obj/item/equipped = get_item_by_slot(slot)
+		if(equipped)
+			if(back.atom_storage?.can_insert(equipped, src, FALSE))
+				back.atom_storage?.attempt_insert(equipped, src)
+			else
+				doUnEquip(equipped, FALSE, drop_location())
+	//END OF EDIT
 
 	var/not_handled = FALSE //Added in case we make this type path deeper one day
 	switch(slot)

@@ -4,6 +4,8 @@
 	appearance_flags = TILE_BOUND|PIXEL_SCALE|LONG_GLIDE
 
 	var/last_move = null
+	/// A list containing arguments for Moved().
+	VAR_PRIVATE/tmp/list/active_movement
 	var/anchored = FALSE
 	var/move_resist = MOVE_RESIST_DEFAULT
 	var/move_force = MOVE_FORCE_DEFAULT
@@ -117,7 +119,7 @@
 	color = EM_BLOCK_COLOR
 	appearance_flags = EMISSIVE_APPEARANCE_FLAGS
 
-/atom/movable/Initialize(mapload)
+/atom/movable/Initialize(mapload, ...)
 	. = ..()
 #ifdef UNIT_TESTS
 	if(explosion_block && !HAS_TRAIT(src, TRAIT_BLOCKING_EXPLOSIVES))
@@ -211,9 +213,15 @@
 		move_packet = null
 
 	if(spatial_grid_key)
-		SSspatial_grid.force_remove_from_cell(src)
+		SSspatial_grid.force_remove_from_grid(src)
 
 	LAZYNULL(client_mobs_in_contents)
+
+#ifndef DISABLE_DREAMLUAU
+	// These lists cease existing when src does, so we need to clear any lua refs to them that exist.
+	DREAMLUAU_CLEAR_REF_USERDATA(vis_contents)
+	DREAMLUAU_CLEAR_REF_USERDATA(vis_locs)
+#endif
 
 	. = ..()
 
@@ -594,6 +602,7 @@
  * most of the time you want forceMove()
  */
 /atom/movable/proc/abstract_move(atom/new_loc)
+	RESOLVE_ACTIVE_MOVEMENT // This should NEVER happen, but, just in case...
 	var/atom/old_loc = loc
 	var/direction = get_dir(old_loc, new_loc)
 	loc = new_loc
@@ -607,6 +616,9 @@
 	. = FALSE
 	if(!newloc || newloc == loc)
 		return
+
+	// A mid-movement... movement... occured, resolve that first.
+	RESOLVE_ACTIVE_MOVEMENT
 
 	if(!direction)
 		direction = get_dir(src, newloc)
@@ -657,6 +669,7 @@
 	var/area/oldarea = get_area(oldloc)
 	var/area/newarea = get_area(newloc)
 
+	SET_ACTIVE_MOVEMENT(oldloc, direction, FALSE, old_locs)
 	loc = newloc
 
 	. = TRUE
@@ -677,7 +690,7 @@
 	if(oldarea != newarea)
 		newarea.Entered(src, oldarea)
 
-	Moved(oldloc, direction, FALSE, old_locs)
+	RESOLVE_ACTIVE_MOVEMENT
 
 ////////////////////////////////////////
 
@@ -959,8 +972,9 @@
 
 ///allows this movable to hear and adds itself to the important_recursive_contents list of itself and every movable loc its in
 /atom/movable/proc/become_hearing_sensitive(trait_source = TRAIT_GENERIC)
+	var/already_hearing_sensitive = HAS_TRAIT(src, TRAIT_HEARING_SENSITIVE)
 	ADD_TRAIT(src, TRAIT_HEARING_SENSITIVE, trait_source)
-	if(!HAS_TRAIT(src, TRAIT_HEARING_SENSITIVE))
+	if(already_hearing_sensitive) // If we were already hearing sensitive, we don't wanna be in important_recursive_contents twice, else we'll have potential issues like one radio sending the same message multiple times
 		return
 
 	for(var/atom/movable/location as anything in get_nested_locs(src) + src)
@@ -1096,8 +1110,13 @@
 
 /atom/movable/proc/doMove(atom/destination)
 	. = FALSE
+	RESOLVE_ACTIVE_MOVEMENT
+
 	var/atom/oldloc = loc
 	var/is_multi_tile = bound_width > world.icon_size || bound_height > world.icon_size
+
+	SET_ACTIVE_MOVEMENT(oldloc, NONE, TRUE, null)
+
 	if(destination)
 		///zMove already handles whether a pull from another movable should be broken.
 		if(pulledby && !currently_z_moving)
@@ -1159,7 +1178,7 @@
 			if(old_area)
 				old_area.Exited(src, NONE)
 
-	Moved(oldloc, NONE, TRUE)
+	RESOLVE_ACTIVE_MOVEMENT
 
 /**
  * Called when a movable changes z-levels.
@@ -1460,8 +1479,8 @@
 
 /atom/movable/vv_get_dropdown()
 	. = ..()
-	. += "<option value='?_src_=holder;[HrefToken()];adminplayerobservefollow=[REF(src)]'>Follow</option>"
-	. += "<option value='?_src_=holder;[HrefToken()];admingetmovable=[REF(src)]'>Get</option>"
+	. += "<option value='byond://?_src_=holder;[HrefToken()];adminplayerobservefollow=[REF(src)]'>Follow</option>"
+	. += "<option value='byond://?_src_=holder;[HrefToken()];admingetmovable=[REF(src)]'>Get</option>"
 
 
 /* Language procs
@@ -1469,7 +1488,8 @@
 */
 
 /// Gets or creates the relevant language holder. For mindless atoms, gets the local one. For atom with mind, gets the mind one.
-/atom/movable/proc/get_language_holder(get_minds = TRUE)
+/atom/movable/proc/get_language_holder(get_minds = TRUE) as /datum/language_holder
+	RETURN_TYPE(/datum/language_holder)
 	if(!language_holder)
 		language_holder = new initial_language_holder(src)
 	return language_holder

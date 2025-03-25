@@ -617,12 +617,18 @@
 	beakers += beaker_one
 	beakers += beaker_two
 
-/obj/item/grenade/chem_grenade/bioterrorfoam
+// MONKESTATION EDIT START
+// MONKESTATION EDIT ORIGINAL /obj/item/grenade/chem_grenade/bioterrorfoam
+/obj/item/grenade/chem_grenade/large/bioterrorfoam
+// MONKESTATION EDIT END
 	name = "Bio terror foam grenade"
 	desc = "Tiger Cooperative chemical foam grenade. Causes temporary irration, blindness, confusion, mutism, and mutations to carbon based life forms. Contains additional spore toxin."
 	stage = GRENADE_READY
 
-/obj/item/grenade/chem_grenade/bioterrorfoam/Initialize(mapload)
+// MONKESTATION EDIT START
+// MONKESTATION EDIT ORIGINAL /obj/item/grenade/chem_grenade/bioterrorfoam/Initialize(mapload)
+/obj/item/grenade/chem_grenade/large/bioterrorfoam/Initialize(mapload)
+// MONKESTATION EDIT END
 	. = ..()
 	var/obj/item/reagent_containers/cup/beaker/bluespace/beaker_one = new(src)
 	var/obj/item/reagent_containers/cup/beaker/bluespace/beaker_two = new(src)
@@ -637,12 +643,12 @@
 	beakers += beaker_one
 	beakers += beaker_two
 
-/obj/item/grenade/chem_grenade/tuberculosis
+/obj/item/grenade/chem_grenade/large/tuberculosis //monkestation edit: Large grenades
 	name = "Fungal tuberculosis grenade"
 	desc = "WARNING: GRENADE WILL RELEASE DEADLY SPORES CONTAINING ACTIVE AGENTS. SEAL SUIT AND AIRFLOW BEFORE USE."
 	stage = GRENADE_READY
 
-/obj/item/grenade/chem_grenade/tuberculosis/Initialize(mapload)
+/obj/item/grenade/chem_grenade/large/tuberculosis/Initialize(mapload) //monkestation edit: Large grenades
 	. = ..()
 	var/obj/item/reagent_containers/cup/beaker/bluespace/beaker_one = new(src)
 	var/obj/item/reagent_containers/cup/beaker/bluespace/beaker_two = new(src)

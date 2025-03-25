@@ -1,6 +1,6 @@
 /datum/round_event_control/antagonist/solo/clockcult
 	name = "Clock Cult"
-	tags = list(TAG_SPOOKY, TAG_DESTRUCTIVE, TAG_COMBAT, TAG_TEAM_ANTAG, TAG_EXTERNAL, TAG_MAGICAL)
+	tags = list(TAG_SPOOKY, TAG_DESTRUCTIVE, TAG_COMBAT, TAG_TEAM_ANTAG, TAG_MAGICAL)
 	antag_flag = ROLE_CLOCK_CULTIST
 	antag_datum = /datum/antagonist/clock_cultist
 	typepath = /datum/round_event/antagonist/solo/clockcult
@@ -8,6 +8,7 @@
 	restricted_roles = list(
 		JOB_AI,
 		JOB_CAPTAIN,
+		JOB_NANOTRASEN_REPRESENTATIVE,
 		JOB_BLUESHIELD,
 		JOB_CHAPLAIN,
 		JOB_CYBORG,
@@ -35,8 +36,10 @@
 	min_players = 45
 	roundstart = TRUE
 	earliest_start = 0 SECONDS
-	weight = 4
+	weight = 0
 	max_occurrences = 1
+	event_icon_state = "clockcult"
+	preferred_events = list(/datum/round_event_control/antagonist/solo/bloodcult = 1)
 
 /datum/round_event/antagonist/solo/clockcult
 	end_when = 60000

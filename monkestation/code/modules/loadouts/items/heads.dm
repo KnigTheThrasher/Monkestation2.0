@@ -16,7 +16,7 @@ GLOBAL_LIST_INIT(loadout_helmets, generate_loadout_items(/datum/loadout_item/hea
 /datum/loadout_item/head/insert_path_into_outfit(datum/outfit/outfit, mob/living/carbon/human/equipper, visuals_only = FALSE, override_items = LOADOUT_OVERRIDE_BACKPACK)
 	if(override_items == LOADOUT_OVERRIDE_BACKPACK && !visuals_only)
 		if(outfit.head)
-			LAZYADD(outfit.backpack_contents, outfit.head)
+			spawn_in_backpack(outfit, outfit.head, equipper)
 		outfit.head = item_path
 	else
 		outfit.head = item_path
@@ -183,6 +183,10 @@ GLOBAL_LIST_INIT(loadout_helmets, generate_loadout_items(/datum/loadout_item/hea
 	name = "Bowler Hat"
 	item_path = /obj/item/clothing/head/hats/bowler
 
+/datum/loadout_item/head/mini_crown
+	name = "Mini Crown"
+	item_path = /obj/item/clothing/head/costume/minicrown
+
 /datum/loadout_item/head/tragic
 	name = "Tragic Mime Headpiece"
 	item_path = /obj/item/clothing/head/tragic
@@ -194,6 +198,22 @@ GLOBAL_LIST_INIT(loadout_helmets, generate_loadout_items(/datum/loadout_item/hea
 /datum/loadout_item/head/nemes
 	name = "Headdress of Nemes"
 	item_path = /obj/item/clothing/head/costume/nemes
+
+/datum/loadout_item/head/straw_hat
+	name = "Straw Hat"
+	item_path = /obj/item/clothing/head/costume/straw_hat
+
+/datum/loadout_item/head/flowery
+	name = "Perfumed Bow"
+	item_path = /obj/item/clothing/head/costume/flowery
+
+/datum/loadout_item/head/starry
+	name = "Star Speckled Bow"
+	item_path = /obj/item/clothing/head/costume/starry
+
+/datum/loadout_item/head/tiara
+	name = "Tiara"
+	item_path = /obj/item/clothing/head/costume/tiara
 
 /*
 *	CHRISTMAS
@@ -217,7 +237,7 @@ GLOBAL_LIST_INIT(loadout_helmets, generate_loadout_items(/datum/loadout_item/hea
 	item_path = /obj/item/clothing/head/costume/weddingveil
 
 /datum/loadout_item/head/synde
-	name = "Black Space-Helmet Replica"
+	name = "Red Space Helmet Replica"
 	item_path = /obj/item/clothing/head/syndicatefake
 
 /datum/loadout_item/head/glatiator
@@ -494,6 +514,22 @@ GLOBAL_LIST_INIT(loadout_helmets, generate_loadout_items(/datum/loadout_item/hea
 /datum/loadout_item/head/floral_garland //BUYABLE
 	name = "Floral Garland"
 	item_path = /obj/item/clothing/head/costume/garland
+
+/datum/loadout_item/head/rainbowbunch //BUYABLE
+	name = "Rainbow Flower Crown"
+	item_path = /obj/item/clothing/head/costume/garland/rainbowbunch
+
+/datum/loadout_item/head/sunflower_crown //BUYABLE
+	name = "Sunflower Crown"
+	item_path = /obj/item/clothing/head/costume/garland/sunflower
+
+/datum/loadout_item/head/poppy_crown //BUYABLE
+	name = "Poppy Crown"
+	item_path = /obj/item/clothing/head/costume/garland/poppy
+
+/datum/loadout_item/head/lily_crown //BUYABLE
+	name = "Lily Crown"
+	item_path = /obj/item/clothing/head/costume/garland/lily
 
 /datum/loadout_item/head/sombrero //BUYABLE
 	name = "Sombrero"

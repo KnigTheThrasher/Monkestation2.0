@@ -28,8 +28,8 @@
 	faction = list(FACTION_HOSTILE, FACTION_MAINT_CREATURES)
 
 	unsuitable_atmos_damage = 0
-	minimum_survivable_temperature = 270
-	maximum_survivable_temperature = INFINITY
+	bodytemp_cold_damage_limit = 270
+	bodytemp_heat_damage_limit = INFINITY
 
 	ai_controller = /datum/ai_controller/basic_controller/cockroach
 
@@ -61,6 +61,11 @@
 	blackboard = list(
 		BB_TARGETING_STRATEGY = /datum/targeting_strategy/basic,
 		BB_PET_TARGETING_STRATEGY = /datum/targeting_strategy/basic/not_friends,
+		BB_OWNER_SELF_HARM_RESPONSES = list(
+			"*me waves its antennae in disapproval.",
+			"*me chitters sadly.",
+			"*me chitters around in worry.",
+		)
 	)
 
 	ai_traits = STOP_MOVING_WHEN_PULLED

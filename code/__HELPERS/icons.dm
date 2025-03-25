@@ -767,9 +767,8 @@ world
 	var/render_icon = curicon
 
 	if (render_icon)
-		var/curstates = icon_states(curicon)
-		if(!(curstate in curstates))
-			if ("" in curstates)
+		if(!icon_exists(curicon, curstate))
+			if(icon_exists(curicon, ""))
 				curstate = ""
 			else
 				render_icon = FALSE
@@ -1164,7 +1163,7 @@ GLOBAL_LIST_EMPTY(friendly_animal_types)
 	if(!istext(icon_path) || !length(icon_path))
 		return FALSE
 
-	var/is_in_icon_folder = findtextEx(icon_path, "icons/")
+	var/is_in_icon_folder = findtextEx(icon_path, "icons/") || findtextEx(icon_path, "monkestation/") // STOP PUTTING ICONS IN THE `monkestation/code` FOLDER FFS
 	var/is_dmi_file = findtextEx(icon_path, ".dmi")
 
 	if(is_in_icon_folder && is_dmi_file)
@@ -1465,28 +1464,52 @@ GLOBAL_LIST_EMPTY(transformation_animation_objects)
 		animate(pixel_x = initialpixelx + rand(-pixelshiftx,pixelshiftx), pixel_y = initialpixely + rand(-pixelshifty,pixelshifty), time = shake_interval)
 	animate(pixel_x = initialpixelx, pixel_y = initialpixely, time = shake_interval)
 
-///Checks if the given iconstate exists in the given file, caching the result. Setting scream to TRUE will print a stack trace ONCE.
-/proc/icon_exists(file, state, scream)
-	var/static/list/icon_states_cache = list()
-	if(icon_states_cache[file]?[state])
+/// Checks whether a given icon state exists in a given icon file. If `file` and `state` both exist,
+/// this will return `TRUE` - otherwise, it will return `FALSE`.
+///
+/// If you want a stack trace to be output when the given state/file doesn't exist, use
+/// `/proc/icon_exists_or_scream()`.
+/proc/icon_exists(file, state)
+	// monkestation start: icon_exists cache
+	var/static/list/icon_states_cache
+	if(isnull(icon_states_cache))
+#ifdef PRELOAD_ICON_EXISTS_CACHE
+		icon_states_cache = load_icon_exists_cache() || list()
+#else
+		icon_states_cache = list()
+#endif
+	// monkestation end
+	if(isnull(file) || isnull(state))
+		return FALSE //This is common enough that it shouldn't panic, imo.
+
+	// monkestation start: icon_exists cache
+#ifdef PRELOAD_ICON_EXISTS_CACHE
+	if(isfile(file) && !isnull(icon_states_cache["[file]"]?[state]))
 		return TRUE
+#endif
+	// monkestation end
 
-	if(icon_states_cache[file]?[state] == FALSE)
-		return FALSE
-
-	var/list/states = icon_states(file)
-
-	if(!icon_states_cache[file])
+	if(isnull(icon_states_cache[file]))
 		icon_states_cache[file] = list()
+		for(var/istate in icon_states(file))
+			icon_states_cache[file][istate] = TRUE
 
-	if(state in states)
-		icon_states_cache[file][state] = TRUE
+	return !isnull(icon_states_cache[file][state])
+
+/// Functions the same as `/proc/icon_exists()`, but with the addition of a stack trace if the
+/// specified file or state doesn't exist.
+///
+/// Stack traces will only be output once for each file.
+/proc/icon_exists_or_scream(file, state)
+	if(icon_exists(file, state))
 		return TRUE
-	else
-		icon_states_cache[file][state] = FALSE
-		if(scream)
-			stack_trace("Icon Lookup for state: [state] in file [file] failed.")
-		return FALSE
+
+	var/static/list/screams = list()
+	if(!isnull(screams[file]))
+		screams[file] = TRUE
+		stack_trace("State [state] in file [file] does not exist.")
+
+	return FALSE
 
 /// Cache of the width and height of icon files, to avoid repeating the same expensive operation
 GLOBAL_LIST_EMPTY(icon_dimensions)
@@ -1503,3 +1526,12 @@ GLOBAL_LIST_EMPTY(icon_dimensions)
 		var/icon/my_icon = icon(icon_path)
 		GLOB.icon_dimensions[icon_path] = list("width" = my_icon.Width(), "height" = my_icon.Height())
 	return GLOB.icon_dimensions[icon_path]
+
+/proc/strip_appearance_underlays(mutable_appearance/appearance)
+	var/base_plane = PLANE_TO_TRUE(appearance.plane)
+	for(var/mutable_appearance/underlay as anything in appearance.underlays)
+		if(isnull(underlay))
+			continue
+		if(PLANE_TO_TRUE(underlay.plane) != base_plane)
+			appearance.underlays -= underlay
+	return appearance

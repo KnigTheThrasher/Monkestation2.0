@@ -19,6 +19,7 @@
 	attack_verb_continuous = list("smashes", "crushes", "cleaves", "chops", "pulps")
 	attack_verb_simple = list("smash", "crush", "cleave", "chop", "pulp")
 	sharpness = SHARP_EDGED
+	tool_behaviour = TOOL_MINING
 	actions_types = list(/datum/action/item_action/toggle_light)
 	obj_flags = UNIQUE_RENAME
 	light_system = OVERLAY_LIGHT
@@ -151,9 +152,10 @@
 	destabilizer.hammer_synced = src
 	playsound(user, 'sound/weapons/plasma_cutter.ogg', 100, TRUE)
 	destabilizer.fire()
-	charged = FALSE
-	update_appearance()
-	addtimer(CALLBACK(src, PROC_REF(Recharge)), charge_time)
+	if(charge_time > 0)
+		charged = FALSE
+		update_appearance()
+		addtimer(CALLBACK(src, PROC_REF(Recharge)), charge_time)
 
 /obj/item/kinetic_crusher/proc/Recharge()
 	if(!charged)

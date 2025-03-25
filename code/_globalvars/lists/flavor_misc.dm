@@ -47,13 +47,14 @@ GLOBAL_LIST_EMPTY(caps_list)
 GLOBAL_LIST_EMPTY(pod_hair_list)
 GLOBAL_LIST_EMPTY(ethereal_horns_list) //Monkestation Addition
 GLOBAL_LIST_EMPTY(ethereal_tail_list) //Monkestation Addition
-GLOBAL_LIST_EMPTY(tails_list_monkey) //Monkestation Addition
+GLOBAL_LIST_EMPTY(tails_list_monkey)
 GLOBAL_LIST_EMPTY(anime_top_list) //Monkestation Addition
 GLOBAL_LIST_EMPTY(anime_middle_list) //Monkestation Addition
 GLOBAL_LIST_EMPTY(anime_bottom_list) //Monkestation Addition
 GLOBAL_LIST_EMPTY(arachnid_appendages_list) //Monkestation Addition
 GLOBAL_LIST_EMPTY(arachnid_chelicerae_list) //Monkestation Addition
 GLOBAL_LIST_EMPTY(goblin_ears_list) //Monkestation Addition
+GLOBAL_LIST_EMPTY(goblin_nose_list) //Monkestation Addition
 GLOBAL_LIST_EMPTY(floran_leaves_list) //Monkestation Addition
 GLOBAL_LIST_EMPTY(satyr_fluff_list) //Monkestation Addition
 GLOBAL_LIST_EMPTY(satyr_tail_list) //Monkestation Addition
@@ -66,7 +67,6 @@ GLOBAL_LIST_INIT(color_list_ethereal, list(
 	"Cyan Blue" = "#00ffff",
 	"Dark Blue" = "#6666ff",
 	"Dark Fuschia" = "#C70064", //Monkestation Edit: #CC0066 TO #C70064
-
 	"Dark Green" = "#37835b",
 	"Dark Red" = "#9c3030",
 	"Dull Yellow" = "#fbdf56",
@@ -238,6 +238,8 @@ GLOBAL_LIST_INIT(security_depts_prefs, sort_list(list(
 #define GDUFFELBAG "Grey Duffel Bag"
 #define GSATCHEL "Grey Satchel"
 #define LSATCHEL "Leather Satchel"
+#define BSATCHEL "Black Leather Satchel" //MONKESTATION
+#define RSATCHEL "Retro Satchel" //MONKESTATION
 GLOBAL_LIST_INIT(backpacklist, list(
 	DBACKPACK,
 	DDUFFELBAG,
@@ -246,6 +248,8 @@ GLOBAL_LIST_INIT(backpacklist, list(
 	GDUFFELBAG,
 	GSATCHEL,
 	LSATCHEL,
+	BSATCHEL, //MONKESTATION
+	RSATCHEL, //MONKESTATION
 ))
 
 	//Suit/Skirt

@@ -875,6 +875,14 @@
 
 			var/datum/mutation/human/A = new HM.type(MUT_EXTRA, null, HM)
 			stored_mutations += A
+
+			// monkestationn start: mark as discovered when saving from disk
+			var/datum/mutation/human/mutation_type = A.type
+			if(stored_research && !(mutation_type in stored_research.discovered_mutations))
+				stored_research.discovered_mutations += mutation_type
+				say("Successfully unlocked [A.name].")
+			// monkestationn end
+
 			to_chat(usr,span_notice("Mutation successfully stored."))
 			return
 
@@ -1229,7 +1237,7 @@
 				"UE"=scanner_occupant.dna.unique_enzymes,
 				"UF"=scanner_occupant.dna.unique_features,
 				"name"=scanner_occupant.real_name,
-				"blood_type"=scanner_occupant.dna.blood_type)
+				"blood_type"="[GLOB.blood_types[scanner_occupant.dna.human_blood_type]]")
 
 			return
 
@@ -1719,7 +1727,7 @@
 			scanner_occupant.real_name = buffer_slot["name"]
 			scanner_occupant.name = buffer_slot["name"]
 			scanner_occupant.dna.unique_enzymes = buffer_slot["UE"]
-			scanner_occupant.dna.blood_type = buffer_slot["blood_type"]
+			scanner_occupant.dna.human_blood_type = blood_name_to_blood_type(buffer_slot["blood_type"])
 			scanner_occupant.apply_status_effect(/datum/status_effect/genetic_damage, damage_increase)
 			scanner_occupant.domutcheck()
 			return TRUE
@@ -1737,7 +1745,7 @@
 			scanner_occupant.real_name = buffer_slot["name"]
 			scanner_occupant.name = buffer_slot["name"]
 			scanner_occupant.dna.unique_enzymes = buffer_slot["UE"]
-			scanner_occupant.dna.blood_type = buffer_slot["blood_type"]
+			scanner_occupant.dna.human_blood_type = blood_name_to_blood_type(buffer_slot["blood_type"])
 			scanner_occupant.apply_status_effect(/datum/status_effect/genetic_damage, damage_increase)
 			scanner_occupant.domutcheck()
 			return TRUE

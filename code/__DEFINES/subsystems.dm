@@ -20,7 +20,7 @@
  *
  * make sure you add an update to the schema_version stable in the db changelog
  */
-#define DB_MINOR_VERSION 26 // monkestation edit: we've added plenty of our own tables to the db
+#define DB_MINOR_VERSION 27 // monkestation edit: we've added plenty of our own tables to the db
 
 
 //! ## Timing subsystem
@@ -142,7 +142,8 @@
 #define INIT_ORDER_VIS 80
 #define INIT_ORDER_SECURITY_LEVEL 79 // We need to load before events so that it has a security level to choose from.
 #define INIT_ORDER_DISCORD 78
-#define INIT_ORDER_ACHIEVEMENTS 77
+#define INIT_ORDER_PLEXORA 77 // monkestation addition
+#define INIT_ORDER_ACHIEVEMENTS 76 // monkestation edit: 77 -> 76 for plexora
 #define INIT_ORDER_STATION 74 //This is high priority because it manipulates a lot of the subsystems that will initialize after it.
 #define INIT_ORDER_QUIRKS 73
 #define INIT_ORDER_REAGENTS 72 //HAS to be before mapping and assets - both create objects, which creates reagents, which relies on lists made in this subsystem
@@ -163,6 +164,7 @@
 #define INIT_ORDER_OUTPUTS 35
 #define INIT_ORDER_RESTAURANT 34
 #define INIT_ORDER_POLLUTION 32
+#define INIT_ORDER_FLUIDS 32 // Needs to be above atoms, as some atoms may want to start fluids/gases on init
 #define INIT_ORDER_ATOMS 30
 #define INIT_ORDER_ARMAMENTS 27
 #define INIT_ORDER_LANGUAGE 25
@@ -187,6 +189,7 @@
 #define INIT_ORDER_MINOR_MAPPING -40
 #define INIT_ORDER_PATH -50
 #define INIT_ORDER_EXPLOSIONS -69
+#define INIT_ORDER_CREDITS -93
 #define INIT_ORDER_REPLAYS -94
 #define INIT_ORDER_HOTSPOTS -95 ///only called on oshan so just call it near the end.
 #define INIT_ORDER_TWITCH -96
@@ -203,10 +206,11 @@
 #define FIRE_PRIORITY_RESEARCH 10
 #define FIRE_PRIORITY_VIS 10
 #define FIRE_PRIORITY_AMBIENCE 10
+#define FIRE_PRIORITY_GLOWSHROOMS 10 // monkestation addition: glowshroom processing subsystem
+#define FIRE_PRIORITY_MEMORY_STATS 10 // monkestation addition: memory stats subsystem. uses a low priority as it takes a moment to fully profile memory.
 #define FIRE_PRIORITY_GARBAGE 15
 #define FIRE_PRIORITY_DATABASE 16
 #define FIRE_PRIORITY_WET_FLOORS 20
-#define FIRE_PRIORITY_FLUIDS 20
 #define FIRE_PRIORITY_AIR 20
 #define FIRE_PRIORITY_NPC 20
 #define FIRE_PRIORITY_HYPERSPACE_DRIFT 20
@@ -226,8 +230,10 @@
 #define FIRE_PRIORITY_ACID 40
 #define FIRE_PRIORITY_BURNING 40
 #define FIRE_PRIORITY_DEFAULT 50
+#define FIRE_PRIORITY_PLEXORA 60 // monkestation addition: plexora
 #define FIRE_PRIORITY_PARALLAX 65
 #define FIRE_PRIORITY_INSTRUMENTS 80
+#define FIRE_PRIORITY_FLUIDS 80
 #define FIRE_PRIORITY_STAMINA 95
 #define FIRE_PRIORITY_MOBS 100
 #define FIRE_PRIORITY_ASSETS 105

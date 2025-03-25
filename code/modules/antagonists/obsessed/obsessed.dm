@@ -42,7 +42,9 @@
 	victim_dummy.update_body_parts()
 
 	var/icon/obsessed_icon = render_preview_outfit(preview_outfit)
-	obsessed_icon.Blend(icon('icons/effects/blood.dmi', "uniformblood"), ICON_OVERLAY)
+	var/icon/blood_icon = icon('icons/effects/blood.dmi', "uniformblood")
+	blood_icon.Blend(COLOR_BLOOD, ICON_MULTIPLY)
+	obsessed_icon.Blend(blood_icon, ICON_OVERLAY)
 
 	var/icon/final_icon = finish_preview_icon(obsessed_icon)
 
@@ -65,7 +67,7 @@
 	suit = /obj/item/clothing/suit/apron
 
 /datum/outfit/obsessed/post_equip(mob/living/carbon/human/H)
-	for(var/obj/item/carried_item in H.get_equipped_items(TRUE))
+	for(var/obj/item/carried_item in H.get_equipped_items(include_pockets = TRUE, include_accessories = TRUE))
 		carried_item.add_mob_blood(H)//Oh yes, there will be blood...
 	H.regenerate_icons()
 

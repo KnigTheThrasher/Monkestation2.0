@@ -1,6 +1,6 @@
 /datum/action/cooldown/spell/jaunt/shadow_walk
 	name = "Shadow Walk"
-	desc = "Grants unlimited movement in darkness."
+	desc = "Grants unlimited movement and increased healing in darkness." // monkestation edit
 	background_icon_state = "bg_alien"
 	overlay_icon_state = "bg_alien_border"
 	button_icon = 'icons/mob/actions/actions_minor_antag.dmi'
@@ -33,7 +33,7 @@
 	if(is_jaunting(owner))
 		return TRUE
 	var/turf/cast_turf = get_turf(owner)
-	if(cast_turf.get_lumcount() >= light_threshold)
+	if(!cast_turf.is_softly_lit() && cast_turf.get_lumcount() >= light_threshold)
 		if(feedback)
 			to_chat(owner, span_warning("It isn't dark enough here!"))
 		return FALSE
@@ -45,7 +45,7 @@
 		exit_jaunt(cast_on)
 		return
 
-	playsound(get_turf(owner), 'sound/magic/ethereal_enter.ogg', 50, TRUE, -1)
+	playsound(get_turf(owner), 'sound/effects/nightmare_poof.ogg', 50, TRUE, -1, ignore_walls = FALSE)
 	cast_on.visible_message(span_boldwarning("[cast_on] melts into the shadows!"))
 	cast_on.SetAllImmobility(0)
 	cast_on.setStaminaLoss(0, FALSE)
@@ -96,6 +96,11 @@
 		to_chat(user, span_warning("It really would not be wise to go into space."))
 		return FALSE
 	if(check_light_level(.))
+		// MONKESTATION EDIT START
+		SEND_SIGNAL(user, COMSIG_NIGHTMARE_SNUFF_CHECK, .) // Snuffs nearby lights as if we had already moved to the tile.
+		if(!check_light_level(.)) // Now we check again after snuffing any dim lights.
+			return
+		// MONKESTATION EDIT END
 		if(!light_step_warning())
 			return FALSE
 
@@ -107,7 +112,7 @@
 			reveal_turf.visible_message(span_boldwarning("[jaunter] is revealed by the light!"))
 		else
 			reveal_turf.visible_message(span_boldwarning("[jaunter] emerges from the darkness!"))
-		playsound(reveal_turf, 'sound/magic/ethereal_exit.ogg', 50, TRUE, -1)
+		playsound(reveal_turf, 'sound/effects/nightmare_reappear.ogg', 50, TRUE, -1, ignore_walls = FALSE)
 
 	return ..()
 
@@ -122,7 +127,7 @@
 
 /obj/effect/dummy/phased_mob/shadow/proc/check_light_level(atom/location_to_check)
 	var/turf/light_turf = get_turf(location_to_check)
-	return light_turf.get_lumcount() > light_max // jaunt ends on TRUE
+	return !light_turf.is_softly_lit() && light_turf.get_lumcount() > light_max // jaunt ends on TRUE
 
 /**
  * Checks if the user should recieve a warning that they're moving into light.
@@ -133,7 +138,7 @@
 
 /obj/effect/dummy/phased_mob/shadow/proc/light_step_warning()
 	if(!light_alert_given) //Give the user a warning that they're leaving the darkness
-		balloon_alert(jaunter, "leaving the shadows...")
+		loc.balloon_alert(jaunter, "leaving the shadows...")
 		light_alert_given = TRUE
 		COOLDOWN_START(src, light_step_cooldown, 0.75 SECONDS)
 		addtimer(CALLBACK(src, PROC_REF(reactivate_light_alert)), 1 SECONDS) //You get a .5 second window to bypass the warning before it comes back

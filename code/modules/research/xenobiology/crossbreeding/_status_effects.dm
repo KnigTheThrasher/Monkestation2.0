@@ -11,8 +11,7 @@
 	var/originalcolor
 
 /datum/status_effect/rainbow_protection/on_apply()
-	owner.status_flags |= GODMODE
-	ADD_TRAIT(owner, TRAIT_PACIFISM, /datum/status_effect/rainbow_protection)
+	owner.add_traits(list(TRAIT_PACIFISM, TRAIT_GODMODE), TRAIT_STATUS_EFFECT(id))
 	owner.visible_message(span_warning("[owner] shines with a brilliant rainbow light."),
 		span_notice("You feel protected by an unknown force!"))
 	originalcolor = owner.color
@@ -23,9 +22,8 @@
 	return ..()
 
 /datum/status_effect/rainbow_protection/on_remove()
-	owner.status_flags &= ~GODMODE
+	owner.remove_traits(list(TRAIT_PACIFISM, TRAIT_GODMODE), TRAIT_STATUS_EFFECT(id))
 	owner.color = originalcolor
-	REMOVE_TRAIT(owner, TRAIT_PACIFISM, /datum/status_effect/rainbow_protection)
 	owner.visible_message(span_notice("[owner] stops glowing, the rainbow light fading away."),
 		span_warning("You no longer feel protected..."))
 
@@ -61,8 +59,8 @@
 
 /datum/status_effect/slimerecall
 	id = "slime_recall"
-	duration = -1 //Will be removed by the extract.
-	tick_interval = -1
+	duration = STATUS_EFFECT_PERMANENT //Will be removed by the extract.
+	tick_interval = STATUS_EFFECT_NO_TICK
 	alert_type = null
 	var/interrupted = FALSE
 	var/mob/target
@@ -98,7 +96,7 @@
 /datum/status_effect/frozenstasis
 	id = "slime_frozen"
 	status_type = STATUS_EFFECT_UNIQUE
-	duration = -1 //Will remove self when block breaks.
+	duration = STATUS_EFFECT_PERMANENT //Will remove self when block breaks.
 	alert_type = /atom/movable/screen/alert/status_effect/freon/stasis
 	var/obj/structure/ice_stasis/cube
 
@@ -106,7 +104,7 @@
 	RegisterSignal(owner, COMSIG_LIVING_RESIST, PROC_REF(breakCube))
 	cube = new /obj/structure/ice_stasis(get_turf(owner))
 	owner.forceMove(cube)
-	owner.status_flags |= GODMODE
+	ADD_TRAIT(owner, TRAIT_GODMODE, TRAIT_STATUS_EFFECT(id))
 	return ..()
 
 /datum/status_effect/frozenstasis/tick()
@@ -121,13 +119,13 @@
 /datum/status_effect/frozenstasis/on_remove()
 	if(cube)
 		qdel(cube)
-	owner.status_flags &= ~GODMODE
+	REMOVE_TRAIT(owner, TRAIT_GODMODE, TRAIT_STATUS_EFFECT(id))
 	UnregisterSignal(owner, COMSIG_LIVING_RESIST)
 
 /datum/status_effect/slime_clone
 	id = "slime_cloned"
 	status_type = STATUS_EFFECT_UNIQUE
-	duration = -1
+	duration = STATUS_EFFECT_PERMANENT
 	alert_type = null
 	var/mob/living/clone
 	var/datum/mind/originalmind //For when the clone gibs.
@@ -172,7 +170,7 @@
 /datum/status_effect/slime_clone_decay
 	id = "slime_clonedecay"
 	status_type = STATUS_EFFECT_UNIQUE
-	duration = -1
+	duration = STATUS_EFFECT_PERMANENT
 	alert_type = /atom/movable/screen/alert/status_effect/clone_decay
 
 /datum/status_effect/slime_clone_decay/tick()
@@ -213,13 +211,12 @@
 	return ..()
 
 /datum/status_effect/bonechill/tick()
-	if(prob(50))
-		owner.adjustFireLoss(1)
-		owner.set_jitter_if_lower(6 SECONDS)
-		owner.adjust_bodytemperature(-10)
-		if(ishuman(owner))
-			var/mob/living/carbon/human/humi = owner
-			humi.adjust_coretemperature(-10)
+	if(!prob(50))
+		return
+
+	owner.adjustFireLoss(1)
+	owner.set_jitter_if_lower(6 SECONDS)
+	owner.adjust_bodytemperature(-1 KELVIN)
 
 /datum/status_effect/bonechill/on_remove()
 	owner.remove_movespeed_modifier(/datum/movespeed_modifier/status_effect/bonechill)
@@ -230,11 +227,11 @@
 
 /datum/status_effect/rebreathing
 	id = "rebreathing"
-	duration = -1
+	duration = STATUS_EFFECT_PERMANENT
 	alert_type = null
 
 /datum/status_effect/rebreathing/tick()
-	owner.adjustOxyLoss(-6, 0) //Just a bit more than normal breathing.
+	owner.adjustOxyLoss(-6) //Just a bit more than normal breathing.
 
 ///////////////////////////////////////////////////////
 //////////////////CONSUMING EXTRACTS///////////////////
@@ -247,12 +244,12 @@
 	duration = 100
 
 /datum/status_effect/firecookie/on_apply()
-	ADD_TRAIT(owner, TRAIT_RESISTCOLD,"firecookie")
-	owner.adjust_bodytemperature(110)
+	ADD_TRAIT(owner, TRAIT_RESISTCOLD, TRAIT_STATUS_EFFECT(id))
+	owner.adjust_bodytemperature(20 KELVIN)
 	return ..()
 
 /datum/status_effect/firecookie/on_remove()
-	REMOVE_TRAIT(owner, TRAIT_RESISTCOLD,"firecookie")
+	REMOVE_TRAIT(owner, TRAIT_RESISTCOLD, TRAIT_STATUS_EFFECT(id))
 
 /datum/status_effect/watercookie
 	id = "watercookie"
@@ -261,7 +258,7 @@
 	duration = 100
 
 /datum/status_effect/watercookie/on_apply()
-	ADD_TRAIT(owner, TRAIT_NO_SLIP_WATER,"watercookie")
+	ADD_TRAIT(owner, TRAIT_NO_SLIP_WATER, TRAIT_STATUS_EFFECT(id))
 	return ..()
 
 /datum/status_effect/watercookie/tick()
@@ -269,7 +266,7 @@
 		T.MakeSlippery(TURF_WET_WATER, min_wet_time = 10, wet_time_to_add = 5)
 
 /datum/status_effect/watercookie/on_remove()
-	REMOVE_TRAIT(owner, TRAIT_NO_SLIP_WATER,"watercookie")
+	REMOVE_TRAIT(owner, TRAIT_NO_SLIP_WATER, TRAIT_STATUS_EFFECT(id))
 
 /datum/status_effect/metalcookie
 	id = "metalcookie"
@@ -314,11 +311,11 @@
 	duration = 600
 
 /datum/status_effect/toxincookie/on_apply()
-	ADD_TRAIT(owner, TRAIT_TOXINLOVER,"toxincookie")
+	ADD_TRAIT(owner, TRAIT_TOXINLOVER, TRAIT_STATUS_EFFECT(id))
 	return ..()
 
 /datum/status_effect/toxincookie/on_remove()
-	REMOVE_TRAIT(owner, TRAIT_TOXINLOVER,"toxincookie")
+	REMOVE_TRAIT(owner, TRAIT_TOXINLOVER, TRAIT_STATUS_EFFECT(id))
 
 /datum/status_effect/timecookie
 	id = "timecookie"
@@ -411,11 +408,11 @@
 	duration = 30
 
 /datum/status_effect/plur/on_apply()
-	ADD_TRAIT(owner, TRAIT_PACIFISM, "peacecookie")
+	ADD_TRAIT(owner, TRAIT_PACIFISM, TRAIT_STATUS_EFFECT(id))
 	return ..()
 
 /datum/status_effect/plur/on_remove()
-	REMOVE_TRAIT(owner, TRAIT_PACIFISM, "peacecookie")
+	REMOVE_TRAIT(owner, TRAIT_PACIFISM, TRAIT_STATUS_EFFECT(id))
 
 /datum/status_effect/adamantinecookie
 	id = "adamantinecookie"
@@ -440,7 +437,7 @@
 
 /datum/status_effect/stabilized //The base stabilized extract effect, has no effect of its' own.
 	id = "stabilizedbase"
-	duration = -1
+	duration = STATUS_EFFECT_PERMANENT
 	alert_type = null
 	/// Item which provides this buff
 	var/obj/item/slimecross/stabilized/linked_extract
@@ -488,21 +485,12 @@
 	colour = "orange"
 
 /datum/status_effect/stabilized/orange/tick()
-	var/body_temp_target = owner.get_body_temp_normal(apply_change = FALSE)
+	owner.update_homeostasis_level(id, owner.standard_body_temperature, 0.5 KELVIN)
 
-	var/body_temp_actual = owner.bodytemperature
-	var/body_temp_offset = body_temp_target - body_temp_actual
-	body_temp_offset = clamp(body_temp_offset, -5, 5)
-	owner.adjust_bodytemperature(body_temp_offset)
 
-	if(ishuman(owner))
-		var/mob/living/carbon/human/human = owner
-		var/core_temp_actual = human.coretemperature
-		var/core_temp_offset = body_temp_target - core_temp_actual
-		core_temp_offset = clamp(core_temp_offset, -5, 5)
-		human.adjust_coretemperature(core_temp_offset)
-
-	return ..()
+/datum/status_effect/stabilized/orange/on_remove()
+	. = ..()
+	owner.remove_homeostasis_level(id)
 
 /datum/status_effect/stabilized/purple
 	id = "stabilizedpurple"
@@ -543,11 +531,11 @@
 	colour = "blue"
 
 /datum/status_effect/stabilized/blue/on_apply()
-	ADD_TRAIT(owner, TRAIT_NO_SLIP_WATER, "slimestatus")
+	ADD_TRAIT(owner, TRAIT_NO_SLIP_WATER, TRAIT_STATUS_EFFECT(id))
 	return ..()
 
 /datum/status_effect/stabilized/blue/on_remove()
-	REMOVE_TRAIT(owner, TRAIT_NO_SLIP_WATER, "slimestatus")
+	REMOVE_TRAIT(owner, TRAIT_NO_SLIP_WATER, TRAIT_STATUS_EFFECT(id))
 
 /datum/status_effect/stabilized/metal
 	id = "stabilizedmetal"
@@ -610,7 +598,7 @@
 	var/obj/item/hothands/fire
 
 /datum/status_effect/stabilized/darkpurple/on_apply()
-	ADD_TRAIT(owner, TRAIT_RESISTHEATHANDS, "slimestatus")
+	ADD_TRAIT(owner, TRAIT_RESISTHEATHANDS, TRAIT_STATUS_EFFECT(id))
 	fire = new(owner)
 	return ..()
 
@@ -624,7 +612,7 @@
 	return ..()
 
 /datum/status_effect/stabilized/darkpurple/on_remove()
-	REMOVE_TRAIT(owner, TRAIT_RESISTHEATHANDS, "slimestatus")
+	REMOVE_TRAIT(owner, TRAIT_RESISTHEATHANDS, TRAIT_STATUS_EFFECT(id))
 	qdel(fire)
 
 /datum/status_effect/stabilized/darkpurple/get_examine_text()
@@ -840,7 +828,7 @@
 
 /datum/status_effect/pinkdamagetracker
 	id = "pinkdamagetracker"
-	duration = -1
+	duration = STATUS_EFFECT_PERMANENT
 	alert_type = null
 	var/damage = 0
 	var/lasthealth
@@ -1012,7 +1000,7 @@
 
 /datum/status_effect/stabilized/lightpink/on_apply()
 	owner.add_movespeed_modifier(/datum/movespeed_modifier/status_effect/lightpink)
-	ADD_TRAIT(owner, TRAIT_PACIFISM, STABILIZED_LIGHT_PINK_EXTRACT_TRAIT)
+	ADD_TRAIT(owner, TRAIT_PACIFISM, TRAIT_STATUS_EFFECT(id))
 	return ..()
 
 /datum/status_effect/stabilized/lightpink/tick()
@@ -1024,7 +1012,7 @@
 
 /datum/status_effect/stabilized/lightpink/on_remove()
 	owner.remove_movespeed_modifier(/datum/movespeed_modifier/status_effect/lightpink)
-	REMOVE_TRAIT(owner, TRAIT_PACIFISM, STABILIZED_LIGHT_PINK_EXTRACT_TRAIT)
+	REMOVE_TRAIT(owner, TRAIT_PACIFISM, TRAIT_STATUS_EFFECT(id))
 
 /datum/status_effect/stabilized/adamantine
 	id = "stabilizedadamantine"

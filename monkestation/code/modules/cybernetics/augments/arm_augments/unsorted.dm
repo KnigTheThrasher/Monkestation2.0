@@ -143,17 +143,15 @@
 			return
 		H.cybernetics_ammo[zone] = null
 
-		counter_ref.hud = null
 		H.infodisplay -= counter_ref
 		H.mymob.client.screen -= counter_ref
 		QDEL_NULL(counter_ref)
 		return
 
 	if(!H.cybernetics_ammo[zone])
-		counter_ref = new()
+		counter_ref = new(null, H)
 		counter_ref.screen_loc =  zone == BODY_ZONE_L_ARM ? ui_hand_position(1,1,9) : ui_hand_position(2,1,9)
 		H.cybernetics_ammo[zone] = counter_ref
-		counter_ref.hud = H
 		H.infodisplay += counter_ref
 		H.mymob.client.screen += counter_ref
 
@@ -204,6 +202,7 @@
 	update_hud_elements()
 
 /obj/item/organ/internal/cyberimp/arm/ammo_counter/syndicate
+	organ_flags = parent_type::organ_flags | ORGAN_HIDDEN
 	encode_info = AUGMENT_SYNDICATE_LEVEL
 
 /obj/item/organ/internal/cyberimp/arm/cooler
@@ -219,14 +218,14 @@
 	. = ..()
 	if(!check_compatibility())
 		return
-	var/amt = BODYTEMP_NORMAL - owner.get_body_temp_normal()
+	var/amt = BODYTEMP_NORMAL - owner.standard_body_temperature
 	if(amt == 0)
 		return
-	owner.add_body_temperature_change("dermal_cooler_[zone]",clamp(amt,-1,0))
+	owner.add_homeostasis_level(type, amt, 0.25 KELVIN)
 
 /obj/item/organ/internal/cyberimp/arm/cooler/Remove(mob/living/carbon/M, special)
 	. = ..()
-	owner.remove_body_temperature_change("dermal_cooler_[zone]")
+	owner.remove_homeostasis_level(type)
 
 /obj/item/organ/internal/cyberimp/arm/heater
 	name = "sub-dermal heater implant"
@@ -241,11 +240,11 @@
 	. = ..()
 	if(!check_compatibility())
 		return
-	var/amt = BODYTEMP_NORMAL - owner.get_body_temp_normal()
+	var/amt = BODYTEMP_NORMAL - owner.standard_body_temperature
 	if(amt == 0)
 		return
-	owner.add_body_temperature_change("dermal_heater_[zone]",clamp(amt,0,1))
+	owner.add_homeostasis_level(type, amt, 0.25 KELVIN)
 
 /obj/item/organ/internal/cyberimp/arm/heater/Remove(mob/living/carbon/M, special)
 	. = ..()
-	owner.remove_body_temperature_change("dermal_heater_[zone]")
+	owner.remove_homeostasis_level(type)

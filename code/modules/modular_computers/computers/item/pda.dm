@@ -36,7 +36,10 @@
 		/datum/computer_file/program/messenger,
 		/datum/computer_file/program/nt_pay,
 		/datum/computer_file/program/notepad,
-		/datum/computer_file/program/crew_manifest // monke edit: install crew manifest by default
+		// monkestation edit: install crew manifest and spess.tv by default
+		/datum/computer_file/program/crew_manifest,
+		/datum/computer_file/program/secureye/spesstv,
+		// monkestation end
 	)
 	///List of items that can be stored in a PDA
 	var/static/list/contained_item = list(
@@ -303,6 +306,9 @@
 	starting_programs = list(
 		/datum/computer_file/program/filemanager,
 		/datum/computer_file/program/robotact,
+		/datum/computer_file/program/borg_monitor,
+		/datum/computer_file/program/atmosscan,
+		/datum/computer_file/program/crew_manifest,
 	)
 
 /obj/item/modular_computer/pda/silicon/Initialize(mapload)

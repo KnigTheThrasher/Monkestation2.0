@@ -27,6 +27,10 @@
 	response_harm_simple = "splat"
 
 	ai_controller = /datum/ai_controller/basic_controller/mouse
+	//MONKESTATION EDIT START
+	death_sound = 'sound/effects/mousesqueek.ogg'
+	death_message = "falls limp and lifeless..."
+	//MONKESTATION EDIT STOP
 
 	/// Whether this rat is friendly to players
 	var/tame = FALSE
@@ -38,6 +42,13 @@
 	var/cable_zap_prob = 85
 
 	var/chooses_bodycolor = TRUE
+
+//MONKESTATION EDIT START
+/mob/living/basic/mouse/get_scream_sound()
+	return 'sound/effects/mousesqueek.ogg'
+/mob/living/basic/mouse/get_laugh_sound()
+	return 'sound/effects/mousesqueek.ogg'
+//MONKESTATION EDIT STOP
 
 /mob/living/basic/mouse/Initialize(mapload, tame = FALSE, new_body_color)
 	. = ..()
@@ -147,6 +158,24 @@
 	if(istype(attack_target, /obj/item/food/cheese))
 		try_consume_cheese(attack_target)
 		return TRUE
+	//MONKESTATION EDIT START
+	if(istype(attack_target, /obj/item))
+		if(!attack_target.GetComponent(/datum/component/edible))
+			return
+		if(istype(attack_target, /obj/item/food/cheese))
+			return //mice savour cheese differently
+		var/datum/component/edible/edible = attack_target.GetComponent(/datum/component/edible)
+		edible.UseByMouse(edible, src)
+
+		for(var/datum/reagent/target_reagent in attack_target.reagents.reagent_list)
+			if(istype(target_reagent, /datum/reagent/toxin))
+				visible_message(
+					span_warning("[src] devours [attack_target]! They pause for a moment..."),
+					span_warning("You devour [attack_target], something tastes off..."),
+				)
+				if(health != 0)
+					adjust_health(4)
+	//MONKESTATION EDIT STOP
 
 	if(istype(attack_target, /obj/structure/cable))
 		try_bite_cable(attack_target)
@@ -390,6 +419,13 @@
 		BB_LOW_PRIORITY_HUNTING_TARGET = null, // cable
 		BB_TARGETING_STRATEGY = /datum/targeting_strategy/basic, // Use this to find people to run away from
 		BB_BASIC_MOB_FLEE_DISTANCE = 3,
+		BB_OWNER_SELF_HARM_RESPONSES = list(
+			"*me cleans its whiskers in disapproval.",
+			"*me squeaks sadly.",
+			"*me sheds a single small tear.",
+			"MY LIEGE! NO!!",
+			"*me offers a crumb of cheese to cheer you up.",
+		)
 	)
 
 	ai_traits = STOP_MOVING_WHEN_PULLED

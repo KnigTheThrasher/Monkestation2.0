@@ -203,7 +203,10 @@
 		if(SSatoms.InitAtom(src, FALSE, args))
 			//we were deleted
 			return
-		SSdemo.mark_new(src) //Monkestation edit: Replays
+		// monkestation start: replays
+		if(!(flags_1 & DEMO_IGNORE_1))
+			SSdemo.mark_new(src)
+		// monkestation end
 
 /**
  * The primary method that objects are setup in SS13 with
@@ -333,6 +336,14 @@
 
 	if(smoothing_flags & SMOOTH_QUEUED)
 		SSicon_smooth.remove_from_queues(src)
+
+#ifndef DISABLE_DREAMLUAU
+	// These lists cease existing when src does, so we need to clear any lua refs to them that exist.
+	DREAMLUAU_CLEAR_REF_USERDATA(contents)
+	DREAMLUAU_CLEAR_REF_USERDATA(filters)
+	DREAMLUAU_CLEAR_REF_USERDATA(overlays)
+	DREAMLUAU_CLEAR_REF_USERDATA(underlays)
+#endif
 
 	if(material_stats)
 		QDEL_NULL(material_stats)
@@ -1042,20 +1053,19 @@
 
 ///returns the mob's dna info as a list, to be inserted in an object's blood_DNA list
 /mob/living/proc/get_blood_dna_list()
-	if(get_blood_id() != /datum/reagent/blood)
-		return
-	return list("ANIMAL DNA" = "Y-")
+	var/datum/blood_type/blood = get_blood_type()
+	if(!isnull(blood))
+		return list("UNKNOWN DNA" = blood.type)
+	return null
 
 ///Get the mobs dna list
 /mob/living/carbon/get_blood_dna_list()
-	if(get_blood_id() != /datum/reagent/blood)
-		return
-	var/list/blood_dna = list()
-	if(dna)
-		blood_dna[dna.unique_enzymes] = dna.blood_type
-	else
-		blood_dna["UNKNOWN DNA"] = "X*"
-	return blood_dna
+	if(isnull(dna)) // Xenos
+		return ..()
+	var/datum/blood_type/blood = get_blood_type()
+	if(isnull(blood)) // Skeletons?
+		return null
+	return list("[dna.unique_enzymes]" = blood.type)
 
 /mob/living/carbon/alien/get_blood_dna_list()
 	return list("UNKNOWN DNA" = "X*")
@@ -1371,10 +1381,11 @@
 	if(!ismovable(src))
 		var/turf/curturf = get_turf(src)
 		if(curturf)
-			. += "<option value='?_src_=holder;[HrefToken()];adminplayerobservecoodjump=1;X=[curturf.x];Y=[curturf.y];Z=[curturf.z]'>Jump To</option>"
+			. += "<option value='byond://?_src_=holder;[HrefToken()];adminplayerobservecoodjump=1;X=[curturf.x];Y=[curturf.y];Z=[curturf.z]'>Jump To</option>"
 	VV_DROPDOWN_OPTION(VV_HK_MODIFY_TRANSFORM, "Modify Transform")
 	VV_DROPDOWN_OPTION(VV_HK_SPIN_ANIMATION, "SpinAnimation")
 	VV_DROPDOWN_OPTION(VV_HK_STOP_ALL_ANIMATIONS, "Stop All Animations")
+	VV_DROPDOWN_OPTION(VV_HK_SHAKE, "Shake")
 	VV_DROPDOWN_OPTION(VV_HK_SHOW_HIDDENPRINTS, "Show Hiddenprint log")
 	VV_DROPDOWN_OPTION(VV_HK_ADD_REAGENT, "Add Reagent")
 	VV_DROPDOWN_OPTION(VV_HK_TRIGGER_EMP, "EMP Pulse")
@@ -1517,6 +1528,20 @@
 			animate(src, transform = null, flags = ANIMATION_END_NOW) // Literally just fucking stop animating entirely because admin said so
 		return
 
+	// monkestation edit start: forced shake
+	if(href_list[VV_HK_SHAKE] && check_rights(R_FUN))
+		var/pixelshiftx = input(usr, "Choose amount of pixels to shift on X axis","Shake Atom") as null|num
+		var/pixelshifty = input(usr, "Choose amount of pixels to shift on Y axis","Shake Atom") as null|num
+		if(isnull(pixelshiftx) || isnull(pixelshifty))
+			return
+
+		var/duration = input(usr, "Duration? (In seconds)","Shake Atom") as null|num
+		var/shake_interval = input(usr, "Shake interval (In seconds) - Default: 0.02", "Shake Atom", 0.02) as null|num
+		if(isnull(shake_interval) || isnull(duration))
+			return
+
+		src.Shake(pixelshiftx, pixelshifty, duration * 10, shake_interval * 10)
+	// monkestation edit end
 	if(href_list[VV_HK_AUTO_RENAME] && check_rights(R_VAREDIT))
 		var/newname = input(usr, "What do you want to rename this to?", "Automatic Rename") as null|text
 		// Check the new name against the chat filter. If it triggers the IC chat filter, give an option to confirm.
@@ -1542,7 +1567,7 @@
 	. = ..()
 	var/refid = REF(src)
 	. += "[VV_HREF_TARGETREF(refid, VV_HK_AUTO_RENAME, "<b id='name'>[src]</b>")]"
-	. += "<br><font size='1'><a href='?_src_=vars;[HrefToken()];rotatedatum=[refid];rotatedir=left'><<</a> <a href='?_src_=vars;[HrefToken()];datumedit=[refid];varnameedit=dir' id='dir'>[dir2text(dir) || dir]</a> <a href='?_src_=vars;[HrefToken()];rotatedatum=[refid];rotatedir=right'>>></a></font>"
+	. += "<br><font size='1'><a href='byond://?_src_=vars;[HrefToken()];rotatedatum=[refid];rotatedir=left'><<</a> <a href='byond://?_src_=vars;[HrefToken()];datumedit=[refid];varnameedit=dir' id='dir'>[dir2text(dir) || dir]</a> <a href='byond://?_src_=vars;[HrefToken()];rotatedatum=[refid];rotatedir=right'>>></a></font>"
 
 ///Where atoms should drop if taken from this atom
 /atom/proc/drop_location()

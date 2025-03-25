@@ -66,7 +66,9 @@
 	///Just stop the mech from doing anything
 	var/completely_disabled = FALSE
 	///Whether this mech is allowed to move diagonally
-	var/allow_diagonal_movement = FALSE
+	var/allow_diagonal_movement = TRUE
+	///Whether this mech moves into a direct as soon as it goes to move. Basically, turn and step in the same key press.
+	var/pivot_step = FALSE
 	///Whether or not the mech destroys walls by running into it.
 	var/bumpsmash = FALSE
 
@@ -276,6 +278,7 @@
 			equip_by_category[key] -= path
 
 	AddElement(/datum/element/falling_hazard, damage = 80, wound_bonus = 10, hardhat_safety = FALSE, crushes = TRUE)
+	AddElement(/datum/element/hostile_machine)
 
 /obj/vehicle/sealed/mecha/Destroy()
 	for(var/ejectee in occupants)

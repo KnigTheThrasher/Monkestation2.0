@@ -67,6 +67,7 @@
 		"Herbalist",
 		"Florist",
 		"Rancher",
+		"Druid",
 	)
 
 /datum/job/brig_physician
@@ -86,6 +87,8 @@
 		"Commanding Officer",
 		"Site Manager",
 		"Criminally Underpaid Babysitter",
+		"Princess",
+		"Head of Command",
 	)
 
 /datum/job/cargo_technician
@@ -294,6 +297,7 @@
 		"Research Supervisor",
 		"Chief Science Officer",
 		"Chief Artificer",
+		"Head of Science",
 	)
 
 /datum/job/roboticist
@@ -302,6 +306,7 @@
 		"Biomechanical Engineer",
 		"Mechatronic Engineer",
 		"Apprentice Roboticist",
+		"Ripperdoc",
 	)
 
 /datum/job/science_guard //See orderly

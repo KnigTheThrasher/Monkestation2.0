@@ -89,6 +89,8 @@ GLOBAL_LIST_INIT(borer_second_name, world.file2list("monkestation/code/modules/a
 	icon_dead = "brainslug_dead"
 	maxHealth = 25
 	health = 25
+	// Allows them to understand any language their current host can.
+	initial_language_holder = /datum/language_holder/borer
 	// They need to be able to pass tables and mobs
 	pass_flags = PASSTABLE | PASSMOB
 	density = FALSE
@@ -244,16 +246,11 @@ GLOBAL_LIST_INIT(borer_second_name, world.file2list("monkestation/code/modules/a
 
 /mob/living/basic/cortical_borer/Initialize(mapload)
 	. = ..()
-	AddComponent( \
-		/datum/component/squashable, \
-		squash_chance = 25, \
-		squash_damage = 25, \
-		squash_flags = SQUASHED_DONT_SQUASH_IN_CONTENTS, \
-	)
+
 	ADD_TRAIT(src, TRAIT_VENTCRAWLER_ALWAYS, INNATE_TRAIT) //they need to be able to move around
 
 	var/matrix/borer_matrix = matrix(transform)
-	borer_matrix.Scale(0.5, 0.5)
+	borer_matrix.Scale(0.75, 0.75)
 	transform = borer_matrix
 
 	create_name()
@@ -415,7 +412,7 @@ GLOBAL_LIST_INIT(borer_second_name, world.file2list("monkestation/code/modules/a
 /mob/living/basic/cortical_borer/handle_environment(datum/gas_mixture/environment, seconds_per_tick, times_fired)
 	var/loc_temp
 	if(human_host)
-		loc_temp = human_host.coretemperature // set the local temp to that of the host's core temp
+		loc_temp = human_host.bodytemperature // set the local temp to that of the host's core temp
 	else
 		loc_temp = get_temperature(environment)
 	var/temp_delta = loc_temp - bodytemperature
@@ -426,9 +423,9 @@ GLOBAL_LIST_INIT(borer_second_name, world.file2list("monkestation/code/modules/a
 
 	if(temp_delta < 0) // it is cold here
 		if(!on_fire) // do not reduce body temp when on fire
-			adjust_bodytemperature(max(max(temp_delta / BODYTEMP_DIVISOR, BODYTEMP_COOLING_MAX) * seconds_per_tick, temp_delta))
+			adjust_bodytemperature(max(max(temp_delta / BODYTEMP_DIVISOR, BODYTEMP_HOMEOSTASIS_COOLING_MAX) * seconds_per_tick, temp_delta))
 	else // this is a hot place
-		adjust_bodytemperature(min(min(temp_delta / BODYTEMP_DIVISOR, BODYTEMP_HEATING_MAX) * seconds_per_tick, temp_delta))
+		adjust_bodytemperature(min(min(temp_delta / BODYTEMP_DIVISOR, BODYTEMP_HOMEOSTASIS_HEATING_MAX) * seconds_per_tick, temp_delta))
 
 //leave the host, forced or not
 /mob/living/basic/cortical_borer/proc/leave_host()

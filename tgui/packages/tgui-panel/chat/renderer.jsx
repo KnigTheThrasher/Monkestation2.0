@@ -5,7 +5,6 @@
  */
 
 import { EventEmitter } from 'common/events';
-import { classes } from 'common/react';
 import { createLogger } from 'tgui/logging';
 import {
   COMBINE_MAX_MESSAGES,
@@ -82,6 +81,9 @@ const handleImageError = (e) => {
   setTimeout(() => {
     /** @type {HTMLImageElement} */
     const node = e.target;
+    if (!node) {
+      return;
+    }
     const attempts = parseInt(node.getAttribute('data-reload-n'), 10) || 0;
     if (attempts >= IMAGE_RETRY_LIMIT) {
       logger.error(`failed to load an image after ${attempts} attempts`);
@@ -106,10 +108,7 @@ const updateMessageBadge = (message) => {
   const foundBadge = node.querySelector('.Chat__badge');
   const badge = foundBadge || document.createElement('div');
   badge.textContent = times;
-  badge.className = classes(['Chat__badge', 'Chat__badge--animate']);
-  requestAnimationFrame(() => {
-    badge.className = 'Chat__badge';
-  });
+  badge.className = 'Chat__badge';
   if (!foundBadge) {
     node.appendChild(badge);
   }
@@ -167,7 +166,7 @@ class ChatRenderer {
     // Find scrollable parent
     this.scrollNode = findNearestScrollableParent(this.rootNode);
     this.scrollNode.addEventListener('scroll', this.handleScroll);
-    setImmediate(() => {
+    setTimeout(() => {
       this.scrollToBottom();
     });
     // Flush the queue
@@ -206,6 +205,7 @@ class ChatRenderer {
       const matchCase = setting.matchCase;
       const enabled = setting.enabled;
       const allowedRegex = /^[a-zа-яё0-9_\-$/^[\s\]\\]+$/gi;
+      const regexEscapeCharacters = /[!#$%^&*)(+=.<>{}[\]:;'"|~`_\-\\/]/g;
       const lines = String(text)
         .split(',')
         .map((str) => str.trim())
@@ -215,7 +215,8 @@ class ChatRenderer {
             str &&
             str.length > 1 &&
             // Must be alphanumeric (with some punctuation)
-            allowedRegex.test(str) &&
+            (allowedRegex.test(str) ||
+              (str.charAt(0) === '/' && str.charAt(str.length - 1) === '/')) &&
             // Reset lastIndex so it does not mess up the next word
             ((allowedRegex.lastIndex = 0) || true),
         );
@@ -241,19 +242,29 @@ class ChatRenderer {
           if (!highlightWords) {
             highlightWords = [];
           }
+          // We're not going to let regex characters fuck up our RegEx operation.
+          line = line.replace(regexEscapeCharacters, '\\$&');
+
           highlightWords.push(line);
         }
       }
       const regexStr = regexExpressions.join('|');
       const flags = 'g' + (matchCase ? '' : 'i');
-      // setting regex overrides matchword
-      if (regexStr) {
-        highlightRegex = new RegExp('(' + regexStr + ')', flags);
-      } else {
-        const pattern = `${matchWord ? '\\b' : ''}(${lines.join('|')})${
-          matchWord ? '\\b' : ''
-        }`;
-        highlightRegex = new RegExp(pattern, flags);
+      // We wrap this in a try-catch to ensure that broken regex doesn't break
+      // the entire chat.
+      try {
+        // setting regex overrides matchword
+        if (regexStr) {
+          highlightRegex = new RegExp('(' + regexStr + ')', flags);
+        } else {
+          const pattern = `${matchWord ? '\\b' : ''}(${highlightWords.join(
+            '|',
+          )})${matchWord ? '\\b' : ''}`;
+          highlightRegex = new RegExp(pattern, flags);
+        }
+      } catch {
+        // We just reset it if it's invalid.
+        highlightRegex = null;
       }
       // Lazy init
       if (!this.highlightParsers) {
@@ -301,11 +312,7 @@ class ChatRenderer {
     }
   }
 
-  getCombinableMessage(predicate) {
-    const now = Date.now();
-    const len = this.visibleMessages.length;
-    const from = len - 1;
-    const to = Math.max(0, len - COMBINE_MAX_MESSAGES);
+  getCombinableMessage(predicate, now, from, to) {
     for (let i = from; i >= to; i--) {
       const message = this.visibleMessages[i];
       // prettier-ignore
@@ -340,10 +347,14 @@ class ChatRenderer {
     const fragment = document.createDocumentFragment();
     const countByType = {};
     let node;
+
+    const len = this.visibleMessages.length;
+    const from = len - 1;
+    const to = Math.max(0, len - COMBINE_MAX_MESSAGES);
     for (let payload of batch) {
       const message = createMessage(payload);
       // Combine messages
-      const combinable = this.getCombinableMessage(message);
+      const combinable = this.getCombinableMessage(message, now, from, to);
       if (combinable) {
         combinable.times = (combinable.times || 1) + 1;
         updateMessageBadge(combinable);
@@ -477,7 +488,7 @@ class ChatRenderer {
         this.rootNode.appendChild(fragment);
       }
       if (this.scrollTracking) {
-        setImmediate(() => this.scrollToBottom());
+        setTimeout(() => this.scrollToBottom());
       }
     }
     // Notify listeners that we have processed the batch
@@ -616,13 +627,13 @@ class ChatRenderer {
       + '</body>\n'
       + '</html>\n';
     // Create and send a nice blob
-    const blob = new Blob([pageHtml]);
+    const blob = new Blob([pageHtml], { type: 'text/plain' });
     const timestamp = new Date()
       .toISOString()
       .substring(0, 19)
       .replace(/[-:]/g, '')
       .replace('T', '-');
-    window.navigator.msSaveBlob(blob, `ss13-chatlog-${timestamp}.html`);
+    Byond.saveBlob(blob, `ss13-chatlog-${timestamp}.html`, '.html');
   }
 }
 

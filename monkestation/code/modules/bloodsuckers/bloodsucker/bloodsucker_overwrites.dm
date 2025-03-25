@@ -30,10 +30,11 @@
 		return
 	return ..()
 
-/mob/living/carbon/human/natural_bodytemperature_stabilization(datum/gas_mixture/environment, seconds_per_tick, times_fired)
-	// Return 0 as your natural temperature. Species proc handle_environment() will adjust your temperature based on this.
-	if(HAS_TRAIT(src, TRAIT_COLDBLOODED))
-		return 0
+/obj/item/clothing/neck/necklace/memento_mori/check_health(mob/living/source)
+	if(source.health <= HEALTH_THRESHOLD_DEAD && IS_BLOODSUCKER(source))
+		to_chat(source, span_warning("The Memento notices your undead soul and is enraged by your trickery"))
+		mori()
+		return
 	return ..()
 
 // Used when analyzing a Bloodsucker, Masquerade will hide brain traumas (Unless you're a Beefman)
